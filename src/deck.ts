@@ -45,17 +45,17 @@ export class Deck {
             }),
 
             // EQ
-            new DeckFineMidiControl(this.index, "EqLow", {
+            new DeckMidiControl(this.index, "EqLow", true, {
                 onValueChanged: value => {
                     engine.setParameter(eqGroup, "parameter1", value);
                 }
             }),
-            new DeckFineMidiControl(this.index, "EqMid", {
+            new DeckMidiControl(this.index, "EqMid", true, {
                 onValueChanged: value => {
                     engine.setParameter(eqGroup, "parameter2", value);
                 }
             }),
-            new DeckFineMidiControl(this.index, "EqHigh", {
+            new DeckMidiControl(this.index, "EqHigh", true, {
                 onValueChanged: value => {
                     engine.setParameter(eqGroup, "parameter3", value);
                 }
@@ -68,7 +68,7 @@ export class Deck {
                 }
             }), */
 
-            new DeckFineMidiControl(this.index, "Volume", {
+            new DeckMidiControl(this.index, "Volume", true, {
                 onValueChanged: value => {
                     this.setParameter("volume", value);
                 }
@@ -139,7 +139,7 @@ export class Deck {
         }
 
         const jogWheelCenter = 0x40;
-        this.controls.push(new DeckMidiControl(this.index, "JogEncoder", {
+        this.controls.push(new DeckMidiControl(this.index, "JogEncoder", false, {
             onNewValue: value => {
                 if (engine.isScratching(this.channel)) {
                     engine.scratchTick(this.channel, value - jogWheelCenter);
@@ -155,7 +155,7 @@ export class Deck {
         };
 
         for (const controlName in jogWheelSpeeds) {
-            this.controls.push(new DeckMidiControl(this.index, controlName, {
+            this.controls.push(new DeckMidiControl(this.index, controlName, false, {
                 onNewValue: value => {
                     engine.scratchTick(this.channel, (value - jogWheelCenter) * jogWheelSpeeds[controlName]);
                 }

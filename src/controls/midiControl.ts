@@ -2,17 +2,19 @@ export class MidiControl {
 
     public lastValue: number = 0;
 
-    constructor(readonly name: string, protected readonly callback: MidiControlCallback) {}
+    constructor(readonly name: string, readonly scaled: boolean, protected readonly callback: MidiControlCallback) {}
 
     public offerValue(name: string, value: number) {
         if (name != this.name) return;
 
-        if (this.callback.onNewValue) this.callback.onNewValue(value);
+        let scaledValue = this.scaled ? value / 0x7F : value;
 
-        if (this.lastValue === value) return;
+        if (this.callback.onNewValue) this.callback.onNewValue(scaledValue);
 
-        if (this.callback.onValueChanged) this.callback.onValueChanged(value);
-        this.lastValue = value;
+        if (this.lastValue === scaledValue) return;
+
+        if (this.callback.onValueChanged) this.callback.onValueChanged(scaledValue);
+        this.lastValue = scaledValue;
     }
 }
 

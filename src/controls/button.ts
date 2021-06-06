@@ -2,7 +2,7 @@ import { MidiControl, MidiControlCallback } from "@controls/midiControl";
 
 export class Button extends MidiControl {
     constructor(name: string, callback: ButtonCallback) {
-        super(name, {
+        super(name, false, {
             onNewValue: (value) => {
                 if (callback.onNewValue) callback.onNewValue(value);
             },

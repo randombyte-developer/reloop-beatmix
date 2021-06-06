@@ -9,7 +9,7 @@ export class FineMidiControl extends MidiControl {
     private lastValueLsb: number = 0;
 
     constructor(readonly name: string, callback: MidiControlCallback) {
-        super(name, callback);
+        super(name, true, callback); // scaled parameter doesn't matter here, because this overrides the offerValue function anyway
 
         this.nameMsb = name + "Msb";
         this.nameLsb = name + "Lsb";

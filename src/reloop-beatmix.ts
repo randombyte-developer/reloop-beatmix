@@ -15,12 +15,12 @@ export function init(): void {
     
     MidiMapping.initReversedMapping();
 
-    decks = [1, 2, 3, 4].map(channel => new Deck(channel));
+    decks = [1, 2].map(channel => new Deck(channel));
 
-    let ignoreCrossfader = true;
+    let ignoreCrossfader = false;
 
     deckIndependentControls = [
-        new FineMidiControl("Crossfader", {
+        new MidiControl("Crossfader", true, {
             onValueChanged: value => {
                 if (ignoreCrossfader) return;
                 engine.setParameter("[Master]", "crossfader", value);
@@ -31,17 +31,12 @@ export function init(): void {
                 activate("[Library]", "MoveFocusForward");
             }
         }),
-        new FineMidiControl("Master", {
-            onValueChanged: value => {
-                engine.setParameter("[Master]", "gain", value * 0.5); // it is a gain, it shouldn't be over 0.5 to avoid clipping
-            }
-        }),
-        new FineMidiControl("Headphone", {
+        new MidiControl("Headphone", true, {
             onValueChanged: value => {
                 engine.setParameter("[Master]", "headGain", value * 0.5);
             }
         }),
-        new FineMidiControl("HeadphoneMix", {
+        new MidiControl("HeadphoneMix", true, {
             onValueChanged: value => {
                 engine.setParameter("[Master]", "headMix", value);
             }
@@ -56,10 +51,9 @@ export function init(): void {
     ];
 
     function traxControl(name: string, factor: number): MidiControl {
-        return new MidiControl(name, {
+        return new MidiControl(name, false, {
             onNewValue: value => {
-                if (value > 0x3F) value = value - 0x80;
-                engine.setValue("[Library]", "MoveVertical", value * factor);
+                engine.setValue("[Library]", "MoveVertical", (value - 0x40) * factor);
             }
         });
     }
@@ -80,7 +74,7 @@ export function midiInput(channel: number, midiNo: number, value: number, status
     engine.log(`${controlName}: ${value}`);
 
     for (const control of controls) {
-        //control.offerValue(controlName, value);
+        control.offerValue(controlName, value);
     }
 }
 
