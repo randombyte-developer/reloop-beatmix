@@ -1,6 +1,5 @@
 import { Button } from "@controls/button";
 import { Deck } from "@/deck";
-import { FineMidiControl } from "@controls/fineMidiControl";
 import { log, toggleControl, activate, makeLedConnection } from "@/utils";
 import { MidiControl } from "./controls/midiControl";
 import { MidiMapping } from "./midiMapping";
@@ -11,13 +10,15 @@ let deckIndependentControls: MidiControl[];
 
 let controls: MidiControl[] = [];
 
+export const ENCODER_CENTER = 0x40;
+
 export function init(): void {
     
     MidiMapping.initReversedMapping();
 
     decks = [1, 2].map(channel => new Deck(channel));
 
-    let ignoreCrossfader = false;
+    let ignoreCrossfader = true;
 
     deckIndependentControls = [
         new MidiControl("Crossfader", true, {
@@ -53,7 +54,7 @@ export function init(): void {
     function traxControl(name: string, factor: number): MidiControl {
         return new MidiControl(name, false, {
             onNewValue: value => {
-                engine.setValue("[Library]", "MoveVertical", (value - 0x40) * factor);
+                engine.setValue("[Library]", "MoveVertical", (value - ENCODER_CENTER) * factor);
             }
         });
     }

@@ -4,6 +4,7 @@ import { DeckFineMidiControl } from "@controls/deckFineMidiControl";
 import { DeckButton } from "@controls/deckButton";
 import { log, toggleControl, activate, makeLedConnection, clamp } from "@/utils";
 import { MidiMapping } from "./midiMapping";
+import { ENCODER_CENTER } from "./reloop-beatmix";
 
 export class Deck {
     public readonly index: number;
@@ -37,10 +38,25 @@ export class Deck {
                 }
             }),
 
-            // Loops
+            // Loop
             new DeckButton(this.index, "LoopButton", {
                 onPressed: () => {
                     this.activate(`beatloop_${this.getValue("beatloop_size")}_toggle`);
+                }
+            }),
+
+            // Loop size
+            new DeckButton(this.index, "FxSelectEncoder", {
+                onNewValue: value => {
+                    const forward = value > ENCODER_CENTER;
+                    this.activate(forward ? "loop_double" : "loop_halve");
+                }
+            }),
+
+            // Gain
+            new DeckMidiControl(this.index, "Gain", true, {
+                onValueChanged: value => {
+                    this.setParameter("pregain", value);
                 }
             }),
 
@@ -62,35 +78,31 @@ export class Deck {
             }),
 
             // Quick Effect / Filter
-/*             new FineMidiControl(0xB6, 0x16 + this.index, 0x36 + this.index, {
+            new DeckMidiControl(this.index, "Filter", true, {
                 onValueChanged: value => {
                     engine.setParameter(filterEffectGroup, "super1", value);
                 }
-            }), */
+            }),
 
             new DeckMidiControl(this.index, "Volume", true, {
                 onValueChanged: value => {
                     this.setParameter("volume", value);
                 }
             }),
-/* 
-            new DeckButton(this.index, 0x1A, {
-                onPressed: () => {
-                    this.toggleControl("quantize");
-                }
-            }), */
 
             // Beatjump
             new DeckButton(this.index, "LoopEncoder", {
                 onNewValue: value => {
-                    const forward = value > 0x40;
-                    if (this.hotcue2.lastValue > 0) {
-                        this.modifyAndClampBeatjumpSize(forward ? 0.5 : 2);
-                    //} else if (this.hotcue3.lastValue > 0) {
-                        this.activate(forward ? "loop_halve" : "loop_double");
-                    } else {
-                        this.activate(forward ? "beatjump_backward" : "beatjump_forward");
-                    }
+                    const forward = value > ENCODER_CENTER;
+                    this.activate(forward ? "beatjump_forward" : "beatjump_backward");
+                }
+            }),
+
+            // Beatjump size
+            new DeckButton(this.index, "LoopEncoderShifted", {
+                onNewValue: value => {
+                    const forward = value > ENCODER_CENTER;
+                    this.modifyAndClampBeatjumpSize(forward ? 2 : 0.5);
                 }
             }),
 
@@ -98,77 +110,37 @@ export class Deck {
                 onValueChanged: value => {
                     this.setParameter("rate", 1 - value);
                 }
-            })
-        ];
-        
+            }),
 
-        // Jog wheel
-        function scratchEnable() {
-            const alpha = 1.0 / 8;
-            const beta = alpha / 32;
-            engine.scratchEnable(channel, 512, 33 + 1 / 3, alpha, beta, true);
-        }
+            // Jog wheel
+            new DeckButton(this.index, "JogTouchButton", {
+                onPressed: () => {                    
+                    const alpha = 1.0 / 8;
+                    const beta = alpha / 32;
+                    engine.scratchEnable(channel, 512, 33 + 1 / 3, alpha, beta, true);
+                },
+                onReleased: () => {
+                    engine.scratchDisable(channel, true);
+                }
+            }),
 
-        function scratchDisable() {
-            engine.scratchDisable(channel, true);
-        }
-
-        const jogTouchButton = "JogTouchButton";
-        const jogTouchButtonShifted = "JogTouchButtonShifted";
-        const jogTouchVariants = [ jogTouchButton, jogTouchButtonShifted ];
-
-        let jogTouchButtonIgnoreNextRelease = false;
-        for (const jogTouchVariant of jogTouchVariants) {
-            this.controls.push(new DeckButton(this.index, jogTouchVariant, {
-                // This has a weird shift state:
-                // Use onNewValue instead of onPressed because the shifted jog touch event only fires values of 0x7F.
-                // It never fires for 0x00, which means that onValueChanged (used for onPressed) also never fires.
-                // And we have to use the unshifted release event which fires even while pressing shift.
+            new DeckMidiControl(this.index, "JogEncoder", false, {
                 onNewValue: value => {
-                    if (value > 0) {
-                        scratchEnable();
-                        jogTouchButtonIgnoreNextRelease = jogTouchVariant == jogTouchButtonShifted;
-                    } else if (!jogTouchButtonIgnoreNextRelease) {
-                        scratchDisable();
+                    if (engine.isScratching(this.channel)) {
+                        engine.scratchTick(this.channel, value - ENCODER_CENTER);
                     } else {
-                        // released button but the event was ignored -> turn off the ignore to accept the next event
-                        jogTouchButtonIgnoreNextRelease = false;
+                        this.setParameter("jog", (value - ENCODER_CENTER) / 10.0);
                     }
                 }
-            }));
-        }
-
-        const jogWheelCenter = 0x40;
-        this.controls.push(new DeckMidiControl(this.index, "JogEncoder", false, {
-            onNewValue: value => {
-                if (engine.isScratching(this.channel)) {
-                    engine.scratchTick(this.channel, value - jogWheelCenter);
-                } else {
-                    this.setParameter("jog", (value - jogWheelCenter) / 10.0);
-                }
-            }
-        }));
-
-        const jogWheelSpeeds: { [controlName: string]: number } = {
-            "JogEncoderTouch": 1,
-            "JogEncoderTouchShifted": 20
-        };
-
-        for (const controlName in jogWheelSpeeds) {
-            this.controls.push(new DeckMidiControl(this.index, controlName, false, {
-                onNewValue: value => {
-                    engine.scratchTick(this.channel, (value - jogWheelCenter) * jogWheelSpeeds[controlName]);
-                }
-            }));
-            
-        }
+            })
+        ];
 
         this.hotcue2 = new DeckButton(this.index, "Hotcue2", { });
 
         this.controls.push(this.hotcue2);
 
         // Hotcues
-        const hotcueIndices = [0, 1];
+        const hotcueIndices = [0, 1, 2];
         for (const hotcueIndex of hotcueIndices) {
             const hotcueNumber = hotcueIndex + 1;
 
@@ -199,11 +171,7 @@ export class Deck {
         }));
 
         // SoftTakeover
-        engine.softTakeover(this.group, "volume", true);
         engine.softTakeover(this.group, "rate", true);
-        engine.softTakeover(eqGroup, "parameter1", true);
-        engine.softTakeover(eqGroup, "parameter2", true);
-        engine.softTakeover(eqGroup, "parameter3", true);
 
         // Leds
         /*this.makeLedConnection("play", "Play");
