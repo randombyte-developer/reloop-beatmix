@@ -12,7 +12,6 @@ export class Deck {
     private readonly group: string;
 
     private readonly hotcue2: DeckButton;
-    private readonly hotcue3: DeckButton;
 
     constructor(readonly channel: number) {
         this.index = channel - 1;
@@ -87,7 +86,7 @@ export class Deck {
                     const forward = value > 0x40;
                     if (this.hotcue2.lastValue > 0) {
                         this.modifyAndClampBeatjumpSize(forward ? 0.5 : 2);
-                    } else if (this.hotcue3.lastValue > 0) {
+                    //} else if (this.hotcue3.lastValue > 0) {
                         this.activate(forward ? "loop_halve" : "loop_double");
                     } else {
                         this.activate(forward ? "beatjump_backward" : "beatjump_forward");
@@ -165,10 +164,8 @@ export class Deck {
         }
 
         this.hotcue2 = new DeckButton(this.index, "Hotcue2", { });
-        this.hotcue3 = new DeckButton(this.index, "Hotcue3", { });
 
         this.controls.push(this.hotcue2);
-        this.controls.push(this.hotcue3);
 
         // Hotcues
         const hotcueIndices = [0, 1];
@@ -209,11 +206,11 @@ export class Deck {
         engine.softTakeover(eqGroup, "parameter3", true);
 
         // Leds
-        this.makeLedConnection("play", "Play");
+        /*this.makeLedConnection("play", "Play");
         this.makeLedConnection("pfl", "Pfl");
         this.makeLedConnection("hotcue_1_enabled", "Hotcue0");
         this.makeLedConnection("hotcue_2_enabled", "Hotcue1");
-        this.makeLedConnection("loop_enabled", "Hotcue3");
+        this.makeLedConnection("loop_enabled", "Hotcue3");*/
 
         this.triggerConnections();
     }

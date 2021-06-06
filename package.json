@@ -1,9 +1,9 @@
 {
-  "name": "ddj-wego",
+  "name": "reloop-beatmix",
   "version": "1.0.0",
-  "description": "A controller mapping for the Pioneer DDJ-Wego for Mixxx",
-  "main": "dist/ddj-sx2.js",
-  "config": { "entry": "./src/ddj-wego.js" },
+  "description": "A controller mapping for the Reloop Beatmix for Mixxx",
+  "main": "dist/reloop-beatmix.js",
+  "config": { "entry": "./src/reloop-beatmix.js" },
   "files": [ "dist" ],
   "scripts": {
     "build": "gulp build",

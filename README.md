@@ -1,2 +1,2 @@
-# ddj-wego
+# reloop-beatmix
 A Mixxx controller mapping.

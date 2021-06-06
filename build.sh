@@ -1,2 +1,2 @@
 npm run build
-cp ./dist/ddj-wego.js ~/.mixxx/controllers
+cp ./dist/reloop-beatmix.js ~/.mixxx/controllers

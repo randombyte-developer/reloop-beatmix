@@ -1,5 +1,5 @@
 export function log(msg: any) {
-    engine.log(`DDJ-WEGO-LOG: ${msg}`);
+    engine.log(`RELOOP-BEATMIX-LOG: ${msg}`);
 }
 
 export function clamp(value: number, min: number, max: number): number {

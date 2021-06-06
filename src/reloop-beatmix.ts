@@ -70,9 +70,6 @@ export function init(): void {
     for (const deck of decks) {
         registerControls(deck.controls);
     }
-
-    // "Traktor Mode": Enables 4 decks operation, jog wheel controlled effects and requests the controller to send all current positions of the controls
-    midi.sendShortMsg(0x9C, 0x7B, 0x00);
 }
 
 export function midiInput(channel: number, midiNo: number, value: number, status: number, group: string): void {
@@ -80,9 +77,10 @@ export function midiInput(channel: number, midiNo: number, value: number, status
 
     const controlName = MidiMapping.mapping[status][midiNo];
     if (controlName == null) return;
+    engine.log(`${controlName}: ${value}`);
 
     for (const control of controls) {
-        control.offerValue(controlName, value);
+        //control.offerValue(controlName, value);
     }
 }
 

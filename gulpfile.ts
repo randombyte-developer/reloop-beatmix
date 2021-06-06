@@ -20,10 +20,10 @@ const dirs = {
 Object.entries(dirs).forEach(([name, file]) => (dirs as any)[name] = path.resolve(__dirname, file));
 
 const files = {
-  entryTs:   "src/ddj-wego.ts",
-  entryJs:   "lib/ddj-wego.js",
-  outputIife: "dist/ddj-wego.js",
-  outputMin:  "dist/ddj-wego.min.js",
+  entryTs:   "src/reloop-beatmix.ts",
+  entryJs:   "lib/reloop-beatmix.js",
+  outputIife: "dist/reloop-beatmix.js",
+  outputMin:  "dist/reloop-beatmix.min.js",
 };
 Object.entries(files).forEach(([name, file]) => (files as any)[name] = path.resolve(__dirname, file));
 
