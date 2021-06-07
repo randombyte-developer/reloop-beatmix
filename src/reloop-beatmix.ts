@@ -8,7 +8,7 @@ import { DeckButton } from "./controls/deckButton";
 let decks: Deck[];
 let deckIndependentControls: MidiControl[];
 
-let controls: MidiControl[] = [];
+const controls: MidiControl[] = [];
 
 export const ENCODER_CENTER = 0x40;
 

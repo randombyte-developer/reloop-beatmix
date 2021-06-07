@@ -7,7 +7,7 @@ export class MidiControl {
     public offerValue(name: string, value: number) {
         if (name != this.name) return;
 
-        let scaledValue = this.scaled ? value / 0x7F : value;
+        const scaledValue = this.scaled ? value / 0x7F : value;
 
         if (this.callback.onNewValue) this.callback.onNewValue(scaledValue);
 

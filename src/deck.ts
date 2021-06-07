@@ -12,8 +12,6 @@ export class Deck {
     private readonly connections: Connection[] = [];
     private readonly group: string;
 
-    private readonly hotcue2: DeckButton;
-
     constructor(readonly channel: number) {
         this.index = channel - 1;
         this.group = `[Channel${channel}]`;
@@ -39,14 +37,14 @@ export class Deck {
             }),
 
             // Loop
-            new DeckButton(this.index, "LoopButton", {
+            new DeckButton(this.index, "AutoLoop", {
                 onPressed: () => {
                     this.activate(`beatloop_${this.getValue("beatloop_size")}_toggle`);
                 }
             }),
 
             // Loop size
-            new DeckButton(this.index, "FxSelectEncoder", {
+            new DeckButton(this.index, "LoopEncoder", {
                 onNewValue: value => {
                     const forward = value > ENCODER_CENTER;
                     this.activate(forward ? "loop_double" : "loop_halve");
@@ -91,7 +89,7 @@ export class Deck {
             }),
 
             // Beatjump
-            new DeckButton(this.index, "LoopEncoder", {
+            new DeckButton(this.index, "FxSelectEncoder", {
                 onNewValue: value => {
                     const forward = value > ENCODER_CENTER;
                     this.activate(forward ? "beatjump_forward" : "beatjump_backward");
@@ -99,7 +97,7 @@ export class Deck {
             }),
 
             // Beatjump size
-            new DeckButton(this.index, "LoopEncoderShifted", {
+            new DeckButton(this.index, "FxSelectEncoderShifted", {
                 onNewValue: value => {
                     const forward = value > ENCODER_CENTER;
                     this.modifyAndClampBeatjumpSize(forward ? 2 : 0.5);
@@ -135,10 +133,6 @@ export class Deck {
             })
         ];
 
-        this.hotcue2 = new DeckButton(this.index, "Hotcue2", { });
-
-        this.controls.push(this.hotcue2);
-
         // Hotcues
         const hotcueIndices = [0, 1, 2];
         for (const hotcueIndex of hotcueIndices) {
@@ -154,6 +148,7 @@ export class Deck {
                     this.activate(`hotcue_${hotcueNumber}_clear`);
                 }
             }));
+            this.makeLedConnection(`hotcue_${hotcueNumber}_enabled`, `Hotcue${hotcueIndex}`);
         }
 
         // Load track
@@ -174,11 +169,9 @@ export class Deck {
         engine.softTakeover(this.group, "rate", true);
 
         // Leds
-        /*this.makeLedConnection("play", "Play");
+        this.makeLedConnection("play", "Play");
         this.makeLedConnection("pfl", "Pfl");
-        this.makeLedConnection("hotcue_1_enabled", "Hotcue0");
-        this.makeLedConnection("hotcue_2_enabled", "Hotcue1");
-        this.makeLedConnection("loop_enabled", "Hotcue3");*/
+        this.makeLedConnection("loop_enabled", "AutoLoop");
 
         this.triggerConnections();
     }
