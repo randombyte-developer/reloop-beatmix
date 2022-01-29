@@ -1,6 +1,6 @@
 {
   "name": "reloop-beatmix",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A controller mapping for the Reloop Beatmix for Mixxx",
   "main": "dist/reloop-beatmix.js",
   "config": { "entry": "./src/reloop-beatmix.js" },
