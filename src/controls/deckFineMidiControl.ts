@@ -1,8 +1,8 @@
-import { FineMidiControl } from "@controls/fineMidiControl";
-import { MidiControlCallback } from "@controls/midiControl";
+import { FineMidiControl } from "./fineMidiControl";
+import { MidiControlCallback } from "./midiControl";
 
 export class DeckFineMidiControl extends FineMidiControl {
-    constructor(deckIndex: number, name: string, callback: MidiControlCallback) {
-        super(deckIndex + name, callback);
-    }
+  constructor(deckIndex: number, name: string, callback: MidiControlCallback) {
+    super(deckIndex + name, callback);
+  }
 }
