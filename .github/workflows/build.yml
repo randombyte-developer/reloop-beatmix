@@ -9,11 +9,9 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm ci
       - run: npm run build
-      -
+      - run: cp ./res/ReloopBeatmix.midi.xml ./dist/
       - uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: |
-            ./dist/reloop-beatmix.js
-            ./res/ReloopBeatmix.midi.xml
+          path: ./dist/*
           if-no-files-found: error
