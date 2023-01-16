@@ -12,5 +12,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: ./dist/reloop-beatmix.js
+          path: |
+            ./dist/reloop-beatmix.js
+            ./res/ReloopBeatmix.midi.xml
           if-no-files-found: error
