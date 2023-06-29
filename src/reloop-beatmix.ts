@@ -18,6 +18,7 @@ export function init(): void {
   decks = [1, 2].map((channel) => new Deck(channel));
 
   let ignoreCrossfader = true;
+  let tracklistSelected = false;
 
   deckIndependentControls = [
     new MidiControl("Crossfader", true, {
@@ -28,7 +29,7 @@ export function init(): void {
     }),
     new Button("TraxButton", {
       onPressed: () => {
-        activate("[Library]", "MoveFocusForward");
+        tracklistSelected = !tracklistSelected;
       },
     }),
     new MidiControl("Headphone", true, {
@@ -53,12 +54,13 @@ export function init(): void {
   function traxControl(name: string, factor: number): MidiControl {
     return new MidiControl(name, false, {
       onNewValue: (value) => {
-        engine.setValue(
-          "[Library]",
-          "MoveVertical",
-          (value - ENCODER_CENTER) * factor
-        );
-      },
+        const direction = (value - ENCODER_CENTER) * factor;
+        if (tracklistSelected) {
+          engine.setValue("[Playlist]", "SelectTrackKnob", direction);
+        } else {
+          engine.setValue("[Playlist]", "SelectPlaylist", direction);
+        }
+      }
     });
   }
   deckIndependentControls.push(traxControl("TraxEncoder", 1));
